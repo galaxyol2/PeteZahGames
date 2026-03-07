@@ -130,9 +130,9 @@ app.get("/api/admin/users-full", (req, res) => {
 app.post("/api/admin/user-action", express.json(), adminUserActionHandler);
 app.post("/api/admin/cleanup-comments", express.json(), cleanupMaliciousCommentsHandler);
 
-app.post("/api/comments", express.json(), addCommentHandler);
+app.post("/api/comment", express.json(), addCommentHandler);
 app.get("/api/comments", getCommentsHandler);
-app.delete("/api/comments", express.json(), deleteCommentHandler);
+app.post("/api/comment/delete", express.json(), deleteCommentHandler);
 
 app.post("/api/likes", express.json(), likeHandler);
 app.get("/api/likes", getLikesHandler);

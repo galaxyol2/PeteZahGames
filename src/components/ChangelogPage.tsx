@@ -90,13 +90,24 @@ export default function ChangelogPage({ onNavigate }: { onNavigate: (url: string
   }
 
   async function openComments(id: string) {
+    if (commentTarget === id) { setCommentTarget(null); return; }
     setCommentTarget(id);
     setCommentsLoading(true);
     setComments([]);
-    fetch(`/api/comments?type=changelog&targetId=${id}`)
+    fetch(`/api/comments?type=changelog&targetId=${id}`, { credentials: "include" })
       .then(r => r.json())
       .then(d => setComments(d.comments || []))
       .finally(() => setCommentsLoading(false));
+  }
+
+  async function deleteComment(commentId: string) {
+    await fetch("/api/comment/delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ commentId }),
+    });
+    setComments(p => p.filter(c => c.id !== commentId));
   }
 
   async function postComment() {
@@ -258,14 +269,23 @@ export default function ChangelogPage({ onNavigate }: { onNavigate: (url: string
                     ) : (
                       <div className="space-y-2 mb-3">
                         {comments.map(c => (
-                          <div key={c.id} className="flex gap-2 items-start">
+                          <div key={c.id} className="flex gap-2 items-start w-full">
                             <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[8px] font-bold" style={{ background: "hsl(215 85% 40%)", color: "hsl(215 85% 80%)" }}>
                               {(c.username || "?")[0].toUpperCase()}
                             </div>
-                            <div>
+                            <div className="flex-1">
                               <span className="text-[10px] font-semibold mr-1.5" style={{ color: "hsl(215 85% 60%)" }}>{c.username || "User"}</span>
                               <span className="text-[11px]" style={{ color: "hsl(220 15% 62%)" }}>{c.content}</span>
                             </div>
+                            {isAdmin && (
+                              <button onClick={() => deleteComment(c.id)}
+                                className="p-1 rounded transition-all flex-shrink-0"
+                                style={{ color: "hsl(220 15% 26%)" }}
+                                onMouseEnter={e => (e.currentTarget.style.color = "hsl(0 65% 52%)")}
+                                onMouseLeave={e => (e.currentTarget.style.color = "hsl(220 15% 26%)")}>
+                                <Trash2 size={9} />
+                              </button>
+                            )}
                           </div>
                         ))}
                       </div>

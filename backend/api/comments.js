@@ -49,7 +49,7 @@ export async function addCommentHandler(req, res) {
   const id = randomUUID();
   const now = Date.now();
   db.prepare('INSERT INTO comments (id, type, target_id, user_id, content, created_at) VALUES (?, ?, ?, ?, ?, ?)').run(id, type, targetId, req.session.user.id, sanitizedContent, now);
-  res.json({ message: 'Comment posted.' });
+  res.json({ message: 'Comment posted.', id });
 }
 
 export async function getCommentsHandler(req, res) {
